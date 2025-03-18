@@ -24,7 +24,7 @@ app.post('/api/generate', async(req,res) => {
         const openaiResponse = await axios.post(
             'https://api.openai.com/v1/chat/completions',
             {
-                model: "gpt-4o",
+                model: "gpt-4o-mini",
                 messages: [
                   {
                     role: "system",
@@ -35,7 +35,7 @@ app.post('/api/generate', async(req,res) => {
                     content: `Generate a witty reply for this dating conversation: "${inputText}"`
                   }
                 ],
-                max_tokens: 50,
+                max_tokens: 150,
             },
               {
                 headers: {
