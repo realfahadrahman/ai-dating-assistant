@@ -54,6 +54,16 @@ app.post('/api/generate', async(req,res) => {
 
 });
 
+const path = require('path');
+
+// Serve static files from the frontend build
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// For any other route, serve the index.html from the frontend
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
