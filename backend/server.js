@@ -13,9 +13,9 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Basic route for testing
-app.get('/', (req, res) =>{
-    res.send("Hello from the backend!");
-});
+// app.get('/', (req, res) =>{
+//     res.send("Hello from the backend!");
+// });
 
 // API endpoint for later use with AI
 app.post('/api/generate', async(req,res) => {
