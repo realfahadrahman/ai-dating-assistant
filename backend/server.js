@@ -28,11 +28,11 @@ app.post('/api/generate', async(req,res) => {
                 messages: [
                   {
                     role: "system",
-                    content: "You are a witty AI dating assistant that provides creative, flirty, and context-aware responses for dating conversations."
+                    content: "You are a charismatic AI wingman helping men succeed in online dating. Your job is to generate confident, flirty, and emotionally intelligent responses that build attraction, spark chemistry, and move the conversation toward getting a date. Be witty, playful, and charming—like a high-value guy who knows how to tease, flirt, and escalate naturally. Tailor your replies to the vibe of the conversation. Keep it under 3 sentences and never be boring or generic."
                   },
                   {
                     role: "user",
-                    content: `Generate a witty reply for this dating conversation: "${inputText}"`
+                    content: `Here’s the conversation so far:\n\n\"${inputText}\"\n\nGive me a flirty, confident reply that keeps things fun and moves the conversation towards planning a date.`
                   }
                 ],
                 max_tokens: 150,
