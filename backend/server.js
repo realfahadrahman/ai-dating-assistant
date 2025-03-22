@@ -41,7 +41,7 @@ app.post('/api/generate', async(req,res) => {
                   },
                   {
                     role: "user",
-                    content: `Here’s the conversation so far:\n\n\"${inputText}\"\n\nGive me a flirty, confident reply that keeps things fun and moves the conversation towards planning a date.`
+                    content: `Here’s the conversation so far:\n\n\"${inputText}\"\n\nGive me a flirty, confident reply that keeps things fun and moves the conversation towards planning a date. Don't use an excess of emojis.`
                   }
                 ],
                 max_tokens: 150,
