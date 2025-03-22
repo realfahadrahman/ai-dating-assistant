@@ -4,9 +4,14 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const axios = require('axios');
+const multer = require('multer');
+const Tesseract = require('tesseract.js');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+
+const path = require('path');
+
 
 // Middleware
 app.use(cors());
@@ -16,6 +21,10 @@ app.use(bodyParser.json());
 // app.get('/', (req, res) =>{
 //     res.send("Hello from the backend!");
 // });
+
+// Configure Multer for file uploads (store files in memory)
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 // API endpoint for later use with AI
 app.post('/api/generate', async(req,res) => {
@@ -54,7 +63,43 @@ app.post('/api/generate', async(req,res) => {
 
 });
 
-const path = require('path');
+// Endpoint: File upload and OCR processing
+app.post('/api/upload', upload.single('screenshot'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded.' });
+  }
+  try {
+    // Perform OCR on the uploaded image
+    const result = await Tesseract.recognize(req.file.buffer, 'eng', { logger: m => console.log(m) });
+    const extractedText = result.data.text.trim();
+
+    // Use the extracted text to generate an AI response
+    const openaiResponse = await axios.post(
+      'https://api.openai.com/v1/chat/completions',
+      {
+        model: "gpt-3.5-turbo",
+        messages: [
+          { role: "system", content: "You are a witty AI dating assistant." },
+          { role: "user", content: `Generate a witty reply for this conversation: "${extractedText}"` }
+        ],
+        max_tokens: 50,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        },
+      }
+    );
+    
+    const aiReply = openaiResponse.data.choices[0].message.content.trim();
+    res.json({ response: aiReply, extractedText });
+  } catch (error) {
+    console.error("Error processing image or calling OpenAI API:", error.message);
+    res.status(500).json({ error: 'Failed to process image and generate response' });
+  }
+});
+
 
 // Serve static files from the frontend build
 app.use(express.static(path.join(__dirname, '../frontend/dist')));

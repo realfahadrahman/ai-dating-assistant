@@ -1,23 +1,42 @@
 import './App.css'
 // In src/App.js
+// frontend/src/App.js
 import React, { useState } from 'react';
 
 function App() {
   const [inputText, setInputText] = useState('');
   const [aiResponse, setAiResponse] = useState('');
+  const [file, setFile] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await fetch('http://localhost:8080/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ inputText }),
-      });
-      const data = await response.json();
-      setAiResponse(data.response);
-    } catch (error) {
-      console.error("Error fetching AI response:", error);
+    // If a file is uploaded, process it using the /api/upload endpoint
+    if (file) {
+      const formData = new FormData();
+      formData.append('screenshot', file);
+      try {
+        const response = await fetch('http://localhost:8080/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await response.json();
+        setAiResponse(data.response);
+      } catch (error) {
+        console.error("Error uploading file:", error);
+      }
+    } else {
+      // Otherwise, use the text input endpoint
+      try {
+        const response = await fetch('http://localhost:8080/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ inputText }),
+        });
+        const data = await response.json();
+        setAiResponse(data.response);
+      } catch (error) {
+        console.error("Error fetching AI response:", error);
+      }
     }
   };
 
@@ -28,8 +47,17 @@ function App() {
         <textarea
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          placeholder="Enter your conversation text..."
+          placeholder="Enter conversation text..."
         />
+        <div>
+          <label htmlFor="screenshot">Or upload a screenshot: </label>
+          <input
+            type="file"
+            id="screenshot"
+            accept="image/*"
+            onChange={(e) => setFile(e.target.files[0])}
+          />
+        </div>
         <button type="submit">Get Response</button>
       </form>
       {aiResponse && (
